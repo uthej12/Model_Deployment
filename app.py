@@ -1,4 +1,4 @@
-from flask import Flask, render_template,request
+from flask import Flask, render_template,request, jsonify
 import pickle
 import numpy as np
 
@@ -25,6 +25,19 @@ def main_page():
         return render_template('predict.html',show = True, res = text)
     else:
         return render_template('predict.html',show = False)
+
+@app.route('/predict', methods=['GET','POST'])
+def predict():
+    model = pickle.load(open('model.sav', 'rb'))
+    cp = int(request.args.get('cp'))
+    max_heart = int(request.args.get('max_heart'))
+    angia = int(request.args.get('angia'))
+    st = float(request.args.get('st'))
+
+    res = model.predict([[cp,max_heart,angia, st]])
+
+    return jsonify(result=str(res[0]))
+
 
 
 if __name__ == '__main__':
